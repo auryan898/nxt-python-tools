@@ -7,9 +7,12 @@ setup(name='nxt-python-tools',
       description='Additional tools and utilities that work with the nxt-python package',
       author='Ryan B Au',
       author_email='auryan898@gmail.com',
-      # url='',
+      url='https://github.com/auryan898/nxt-python-tools',
+      download_url='',
+      keywords=['nxt','nxt-python','lego','mindstorms'],
       packages=['nxttools'],
       scripts=['scripts/nxttools_test'],
+      classifiers=[],
      )
 
-print "\nPlease Install python-tk (Tk), inputs (inputs), nxt-python (nxt), and their respective dependencies"
+print "\n***Please Install python-tk (Tk), inputs (inputs), nxt-python (nxt), and their respective dependencies if you haven't already***"

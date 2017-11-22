@@ -160,3 +160,14 @@ class Player(object):
         self.playSoundSample(1,120)
     def playFile(self,filename,tempo):
         self.playSound(csvToSong(csvfilename),tempo)
+    def csvToSong(filename):
+        #batch is a 2d list that contains a list for each note [[le,2,0],[lf#,1,0]]
+        #may enter batch into playSound() function
+        f = filename #open(input('Enter file to open') + '.csv','r')
+        c = csv.reader(open(f,"r"))
+        batch = []
+        for row in c:
+            batch.append(row)
+        #print batch
+        return batch
+        #    print(row)
