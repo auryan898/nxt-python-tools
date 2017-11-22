@@ -11,3 +11,5 @@ setup(name='nxt-python-tools',
       packages=['nxttools'],
       scripts=['scripts/nxttools_test'],
      )
+
+print "\nPlease Install python-tk (Tk), inputs (inputs), nxt-python (nxt), and their respective dependencies"
