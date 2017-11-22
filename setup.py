@@ -15,4 +15,4 @@ setup(name='nxt-python-tools',
       classifiers=[],
      )
 
-print "\n***Please Install inputs (inputs), nxt-python (nxt), and their respective dependencies if you haven't already***"
+print "\n***Please Install pybluez (lightblue), inputs (inputs), nxt-python (nxt), and their respective dependencies if you haven't already***"
