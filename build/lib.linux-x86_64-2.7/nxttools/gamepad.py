@@ -19,7 +19,7 @@ class ul_Gamepad(object):
     """This is the blueprint for gamepads in the unordered list.
     This unordered list contains a random list of gamepads as they
     are added onto the computer"""
-    start = False #BTN_START    
+    start = True #BTN_START    
     back = False #BTN_SELECT
     guide = False #BTN_MODE    
     #Colorful buttons on right side
@@ -144,45 +144,41 @@ class ul_Gamepad(object):
                         self.right_bumper = True
                     if(event.state==0):
                         self.right_bumper = False
-class ol_Gamepad(object):
+
+    def copy(self,other_gamepad):
+        self.start = other_gamepad.start
+        self.back = other_gamepad.back
+        self.guide = other_gamepad.guide
+        self.a = other_gamepad.a
+        self.b = other_gamepad.b
+        self.x = other_gamepad.x
+        self.y = other_gamepad.y
+        self.dpad_up = other_gamepad.dpad_up
+        self.dpad_down = other_gamepad.dpad_down
+        self.dpad_left = other_gamepad.dpad_left
+        self.dpad_right = other_gamepad.dpad_right
+        self.left_bumper = other_gamepad.left_bumper
+        self.right_bumper = other_gamepad.right_bumper
+        self.left_trigger  = other_gamepad.left_trigger
+        self.right_trigger = other_gamepad.right_trigger
+        self.left_stick_button = other_gamepad.left_stick_button
+        self.right_stick_button = other_gamepad.right_stick_button
+        self.left_stick_y = other_gamepad.left_stick_y
+        self.left_stick_x = other_gamepad.left_stick_x
+        self.right_stick_y = other_gamepad.right_stick_y
+        self.right_stick_x = other_gamepad.right_stick_x
+
+class ol_Gamepad(ul_Gamepad):
     """This is the blueprint for a single gamepad object that contains an unordered list of gamepads
     and then picks on a single gamepad based on a button combination to take on its input properties.
     Essentially, this is a single player's controller, and the button combo assigns a gamepad to this player."""
-    message = 0 #Gamepad Indicator message 3 state switch: int 0-2
-
+    
     status0 = False
     status1 = False
     gamepads = []
     pad = ul_Gamepad()
-    old = ul_Gamepad()
+    
     numG = len(inputs.DeviceManager().gamepads)
-    #center buttons
-    start = False #BTN_START
-    back = False #BTN_SELECT
-    guide = False #BTN_MODE
-    #Colorful buttons on right side
-    a = False #BTN_SOUTH
-    b = False #BTN_EAST
-    x = False #BTN_NORTH
-    y = False #BTN_WEST
-    #Dpad on the left
-    dpad_up = False    #ABS_HAT0Y,-1
-    dpad_down = False  #ABS_HAT0Y, 1
-    dpad_left = False  #ABS_HAT0X,-1
-    dpad_right = False #ABS_HAT0X, 1
-    #Shoulder buttons
-    left_bumper = False    #BTN_TL
-    right_bumper = False   #BTN_TR
-    left_trigger  = 0 #ABS_Z
-    right_trigger = 0 #ABS_RZ
-
-    #Joysticks
-    left_stick_button = False   #BTN_THUMBL
-    right_stick_button = False  #BTN_THUMBR
-    left_stick_y = 0 #ABS_Y
-    left_stick_x = 0 #ABS_X
-    right_stick_y = 0 #ABS_RY
-    right_stick_x = 0 #ABS_RX
 
     def __init__(self,n):
         """n -- represents the player number that this objects identifies with.  This player number
@@ -198,59 +194,49 @@ class ol_Gamepad(object):
         del arr[x]
         return arr
     def status(self):
-        """infinite loop that updates when this gamepad has been assigned or not"""
+        """DEBUG infinite loop that updates when this gamepad has been assigned or not"""
         while 1:
             if(self.status0==self.status1):
                 if(not self.status0):
                     #print "Gamepad %d Unassigned" % (self.id+1)
-                    
+                    pass
                 if(self.status0):
                     print "Gamepad %d Assigned" % (self.id+1)
-                self.message = 0
                 self.status0 = not self.status1
+    def pick_gamepad(self):
+        # These are the control loops with which the gamepad picks its main gamepad to copy input properties from
+        for item in range(len(self.gamepads)):
+            if(self.gamepads[item].start and self.gamepads[item].__dict__[self.button(self.id)]):
+                self.pad = self.gamepads[item]
+                self.status1 = True
+            for f in range(len(self.other_buttons(self.id))):
+                if(self.pad.start and self.pad.__dict__[self.other_buttons(self.id)[f]]):
+                    self.status1 = False
     def update(self):
         """contains an infinite loop that takes the input properties of the 
         original gamepad from the unordered list and makes them its own. """
         for num in range(self.numG):
+            # creates an unordered list of (gamepads) and lets all of 
+            # them update themselves in a separate thread
             self.gamepads.append(ul_Gamepad(num))
             thread.start_new_thread(self.gamepads[num].update,())
-        print("Gamepad "+str(self.id+1)+" Initialized")
-        while (self.id<=self.other_buttons(self.id)):
-            for item in range(len(self.gamepads)):
-                if(self.gamepads[item].start and self.gamepads[item].__dict__[self.button(self.id)]):
-                    self.pad = self.gamepads[item]
-                    self.status1 = True
-                for f in range(len(self.other_buttons(self.id))):
-                    if(self.pad.start and self.pad.__dict__[self.other_buttons(self.id)[f]]):
-                        self.pad = self.old
-                        self.status1 = False
-            self.start = self.pad.start
-            self.back = self.pad.back
-            self.guide = self.pad.guide
-            self.a = self.pad.a
-            self.b = self.pad.b
-            self.x = self.pad.x
-            self.y = self.pad.y
-            self.dpad_up = self.pad.dpad_up
-            self.dpad_down = self.pad.dpad_down
-            self.dpad_left = self.pad.dpad_left
-            self.dpad_right = self.pad.dpad_right
-            self.left_bumper = self.pad.left_bumper
-            self.right_bumper = self.pad.right_bumper
-            self.left_trigger = self.pad.left_trigger
-            self.right_trigger = self.pad.right_trigger
-            self.left_stick_button = self.pad.left_stick_button
-            self.right_stick_button = self.pad.right_stick_button
-            self.left_stick_y = self.pad.left_stick_y
-            self.left_stick_x = self.pad.left_stick_x
-            self.right_stick_y = self.pad.right_stick_y
-            self.right_stick_x = self.pad.right_stick_x
+        
+        print("Gamepad "+str(self.id+1)+" Initialized") # DEBUG message
+
+        while 1:
+            # Infinite loop to check for button combinations that change self.pad 
+            # and copy that gamepad's input properties
+            self.pick_gamepad()
+            self.copy(self.pad)
+            
 
 
     def updater(self):
+        """starts the threads of self.update() and self.status() which are inifite loops"""
         thread.start_new_thread(self.update,())
         thread.start_new_thread(self.status,())
     def toStr_bool(self):
+        """Returns the boolean values of every button on the gamepad and forms a giant string out of it"""
         arr = "start back guide a b x y dpad_up dpad_down dpad_left dpad_right left_bumper right_bumper left_stick_button right_stick_button".split(" ")
         s = ""
         for i in arr:
@@ -259,6 +245,7 @@ class ol_Gamepad(object):
                 s += " "
         return s
     def toStr_float(self):
+        """Returns all float values of every stick or trigger on the gamepad and forms a giant string out of it"""
         arr = "left_trigger right_trigger left_stick_y left_stick_x right_stick_y right_stick_x".split(" ")
         s = ""
         for i in arr:
@@ -267,8 +254,11 @@ class ol_Gamepad(object):
             s += " "
         return s
     def get_state(self):
+        """Conveniently returns an array containing this gamepad's name (ie. gamepad1) the string containing
+        all float values and then the string containing all boolean values"""
         return [str("gamepad"+str(self.id+1)),str(self.toStr_float()),str(self.toStr_bool())]
     def show_status(self):
+        """This is a deprecated function padDisplay was an object that represented a window type output"""
         for f in self.get_state():
             padDisplay.arr.append(f)
 
