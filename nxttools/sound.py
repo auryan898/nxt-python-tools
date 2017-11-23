@@ -13,7 +13,7 @@
 
 
 import nxt
-note_str = "la la# lb lc lc# ld ld# le lf lf# lg lg# a a# b c c# d d# e f f# g g# ha ha# hb hc hc# hd hd# he hf hf# hg hg# 2a 2a# 2b 2c 2c# 2d 2d# 2e 2f 2f# 2g 2g# 3a 3a# 3b 3c 3c# 3d 3d# 3e 3f 3f# 3g 3g# 3a"
+note_str = "la la# lb lc lc# ld ld# le lf lf# lg lg# a a# b c c# d d# e f f# g g# ha ha# hb hc hc# hd hd# he hf hf# hg hg# 2a 2a# 2b 2c 2c# 2d 2d# 2e 2f 2f# 2g 2g# 3a 3a# 3b 3c 3c# 3d 3d# 3e 3f 3f# 3g 3g#"
 note_arr = note_str.split(" ")
 note_freq = {}
 def getFreqFunc(x):
@@ -30,8 +30,8 @@ play_notes = []
 import csv
 import time
 def csvToSong(filename):
-    #batch is a 2d list that contains a list for each note [[le,2,0],[lf#,1,0]]
-    #may enter batch into playSound() function
+    """batch is a 2d list that contains a list for each note [[le,2,0],[lf#,1,0]]
+    may enter batch into playSound() function"""
     f = filename #open(input('Enter file to open') + '.csv','r')
     c = csv.reader(open(f,"r"))
     batch = []
@@ -64,6 +64,7 @@ class PlayerObj(threading.Thread):
         if not self.isAlive():
             self.start()
     def playSoundSample(self,b,batchNum,tempo):
+        """Plays pre-written songs given a tempo, and a song number (0-6)"""
         def batToString(batch):
             return " ".join( ",".join(x) for x in batch)
 
@@ -90,9 +91,9 @@ class PlayerObj(threading.Thread):
         # A C E hA
         self.playSound(b,batchArr,tempo)
     def playSound(self,b,batch,tempo):
-        #tempo is a BPM number for the song
-        #batch is a 2d list that contains a list for each note [["le",2,0],["lf"#,1,0]]
-        #[[note name, duration, amount of silence after]]
+        """tempo is a BPM number for the song
+        batch is a 2d list that contains a list for each note [["le",2,0],["lf"#,1,0]]
+        [[note name, duration, amount of silence after]]"""
         #f = open(input('Enter file to open') + '.csv','r')
         #c = csv.reader(f)
         #batch = []
@@ -111,9 +112,9 @@ class PlayerObj(threading.Thread):
             b.play_tone_and_wait(int(item[0]), int(item[1]) * int(cor_tempo))
             time.sleep(float(item[2]) * cor_tempo/1000)
     def playNote(self,b,name,duration=1,variance=0):
-        #name from the note_freq dictionary, duration is in Milliseconds
-        #variance is percentage pitch modulation from given to tone to next tones
-            #ex. 0.5 to next halfstep, 1 to next wholestep, negative for lower pitch
+        """name from the note_freq dictionary, duration is in Milliseconds
+        variance is percentage pitch modulation from given to tone to next tones
+            ex. 0.5 to next halfstep, 1 to next wholestep, negative for lower pitch"""
         freq = note_freq[name]*(2.0**(1.0/12.0))**(variance*2)
         b.play_tone(int(freq),duration)
 
@@ -124,6 +125,7 @@ class Player(object):
         self.obj = PlayerObj()
         self.brick = brick
     def playSoundSample(self,batchNum,tempo):
+        """Plays pre-written songs given a tempo, and a song number (0-6)"""
         self.safeCreation()
         self.obj.brick = self.brick
         self.obj.FUNC_TYPE = 1
@@ -131,6 +133,9 @@ class Player(object):
         self.obj.ARG2 = tempo
         self.obj.safeStart()
     def playSound(self,batch,tempo):
+        """tempo is a BPM number for the song
+        batch is a 2d list that contains a list for each note [["le",2,0],["lf"#,1,0]]
+        [[note name, duration, amount of silence after]]"""
         self.safeCreation()
         self.obj.brick = self.brick
         self.obj.FUNC_TYPE = 2
@@ -138,6 +143,9 @@ class Player(object):
         self.obj.ARG2 = tempo
         self.obj.safeStart()
     def playNote(self,noteName,duration,variance):
+        """name from the note_freq dictionary, duration is in Milliseconds
+        variance is percentage pitch modulation from given to tone to next tones
+            ex. 0.5 to next halfstep, 1 to next wholestep, negative for lower pitch"""
         self.safeCreation()
         self.obj.brick = self.brick
         self.obj.FUNC_TYPE = 3
@@ -149,6 +157,7 @@ class Player(object):
         if not self.obj.isAlive():
             self.obj = PlayerObj()
     def success(self):
+        """displays a random success message and plays a sound sample 1"""
         message = [
         "It is fully operational!",
         "It's alive!",
@@ -159,10 +168,21 @@ class Player(object):
         print message[random.randint(0,len(message)-1)]
         self.playSoundSample(1,120)
     def playFile(self,filename,tempo):
+        """accepts a string filename and an integer tempo. plays song based on contents of file 
+        according to preset template.
+
+        A single line of the csv file representing a note is setup as follows:
+        letter_name,play_time(sixteenth notes),wait_time(sixteenth notes)
+
+        For letter_name there are no flats, but there are sharps:
+            la    a    ha    2a    3a
+        The la (low A note) is the lowest note possible. 
+        The 3g# is the highest note programmed (but may not play).
+        """
         self.playSound(csvToSong(csvfilename),tempo)
     def csvToSong(filename):
-        #batch is a 2d list that contains a list for each note [[le,2,0],[lf#,1,0]]
-        #may enter batch into playSound() function
+        """batch is a 2d list that contains a list for each note [[le,2,0],[lf#,1,0]]
+        may enter batch into playSound() function"""
         f = filename #open(input('Enter file to open') + '.csv','r')
         c = csv.reader(open(f,"r"))
         batch = []

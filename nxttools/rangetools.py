@@ -11,6 +11,10 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 def clip(VAL,MIN,MAX):
+    """VAL is a value that is to be checked
+    if the VAL is bigger than MAX, return MAX
+    if the VAL is less than MIN, return MIN
+    if the VAL is in between MAX and MIN, then return VAL"""
     if(VAL<MIN):
         return MIN
     elif(VAL>MAX):

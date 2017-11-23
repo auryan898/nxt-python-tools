@@ -16,6 +16,10 @@ from nxt.sensor.hitechnic import *
 
 class DcMotor(MotorCon):
     def __init__(self, brick, port, motorport):
+        """Creates a hitechnic Dc Motor object where 
+        brick is the nxt brick object
+        port is the nxt port value (ie. nxt.PORT_1)
+        motorport is an integer port value on the motor controller"""
         super(DcMotor,self).__init__(brick, port)
         self.motorport = motorport
     def set_power(self,power):
@@ -35,12 +39,20 @@ class DcMotor(MotorCon):
         return decimal value -1 to 1"""
         return self.get_power()
     def set_enc_target(self, val):
+        """Encoder target can be an integer value.  
+        1440 encoders represents 360 degrees, one full rotation."""
         super(DcMotor,self).set_enc_target(self.motorport,val)
     def get_enc_target(self):
+        """Encoder target returned will be an integer value.  
+        1440 encoders represents 360 degrees, one full rotation."""
         return super(DcMotor,self).get_enc_target(self.motorport)
     def get_enc_current(self):
+        """Encoder returned will be an integer value.  
+        1440 encoders represents 360 degrees, one full rotation."""
         return super(DcMotor,self).get_enc_current(self.motorport)
     def get_battery_voltage(self):
+        """Returns battery voltage read by the motor controller 
+        connected to this motor"""
         return super(DcMotor,self).get_battery_voltage()
     def set_mode(self,mode):
         """modes:
@@ -53,6 +65,10 @@ class DcMotor(MotorCon):
 
 class Servo(ServoCon):
     def __init__(self, brick, port, servoport):
+        """Creates hitechnic Servo object where 
+        brick is the nxt brick object
+        port is the nxt port that connects to the servo controller
+        servoport is a port number (1-6) on the servo controller"""
         super(Servo,self).__init__(brick,port)
         self.servoport = servoport
     def set_pos(self, pos):

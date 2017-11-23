@@ -204,7 +204,7 @@ class ol_Gamepad(ul_Gamepad):
                     print "Gamepad %d Assigned" % (self.id+1)
                 self.status0 = not self.status1
     def pick_gamepad(self):
-        # These are the control loops with which the gamepad picks its main gamepad to copy input properties from
+        """These are the control loops with which the gamepad picks its main gamepad to copy input properties from"""
         for item in range(len(self.gamepads)):
             if(self.gamepads[item].start and self.gamepads[item].__dict__[self.button(self.id)]):
                 self.pad = self.gamepads[item]

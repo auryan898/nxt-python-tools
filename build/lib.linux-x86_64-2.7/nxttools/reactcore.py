@@ -14,7 +14,8 @@
 # GNU General Public License for more details.
 
 class ReactCtl(object):
-    CURRSTATE = {}
+    CURRSTATE = {} # Holds the values that are used and watched out for
+    CURRCOUNT = {}    # Holds the counter that allow values to repeat after 15 counts
     PREVSTATE = CURRSTATE.copy()
 
     def __init__(self):
@@ -24,9 +25,9 @@ class ReactCtl(object):
         # returns boolean of whether the values of CURRSTATE and PREVSTATE
         # have changed at all at the identity given
         if ident not in self.CURRSTATE:
+            self.CURRCOUNT[ident] = 0
             self.CURRSTATE[ident] = initial
             self.PREVSTATE[ident] = initial
-            self.PREVSTATE[ident] = self.CURRSTATE[ident]
 
         # self.CURRSTATE[ident] = newest
         # result = self.CURRSTATE[ident]==self.PREVSTATE[ident]
@@ -35,14 +36,18 @@ class ReactCtl(object):
         return self.update(ident,newest)
 
     def get_val(self,ident):
-        return self.CURRSTATE[ident] if ident in self.CURRSTATE else 0
+        return self.CURRSTATE[ident] if ident in self.CURRSTATE else None
     
     def update(self,ident,value):
-        # changes value at identity
-        # returns boolean true if there was a difference
-        self.CURRSTATE[ident] = value
-        result = self.CURRSTATE[ident]==self.PREVSTATE[ident]
-        self.PREVSTATE[ident] = self.CURRSTATE[ident]
-        return not result
+        """changes value at identity
+        returns boolean true if there was a difference between values, or if the counter has hit a value divisble by 15"""
+        self.CURRSTATE[ident] = value # update current states/values
+        isSame = self.CURRSTATE[ident]==self.PREVSTATE[ident] # check if current state is the same as the previous
+        self.PREVSTATE[ident] = self.CURRSTATE[ident] # update the previous state for the next check
+        self.CURRCOUNT[ident]+=1 # increment the current counter
+        if (self.CURRCOUNT[ident]>=150):
+            # reset counter if counter is 150
+            self.CURRCOUNT[ident]=0
+        return (not isSame) or (self.CURRCOUNT[ident]%15 == 0)
 
 reactctl = ReactCtl()
